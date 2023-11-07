@@ -1,11 +1,6 @@
-from googlesearch import search
-
-keyword = 'рту мирэа в г фрязино расписание семестра учебного года для всех форм обучения'
+static_link = "https://f-mirea.ru/students/schedule/"
 
 
-def get_page_link():
-    results = search(keyword, num_results=1)
-    for link in results:
-        return link
+def search_page_element():
+    pass
 
-print(get_page_link())

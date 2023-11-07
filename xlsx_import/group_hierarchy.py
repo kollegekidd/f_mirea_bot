@@ -1,20 +1,9 @@
 from attrs import define
-from functions import remove_redundant_spaces
+from xlsx_import.functions import remove_redundant_spaces, lessons_timetable, days_dict
 
-lessons_timetable = {1: '09-00:10-30',
-                     2: '10-40:12-10',
-                     3: '12-30:14-00',
-                     4: '14-10:15-40',
-                     5: '15-45:17-15',
-                     6: '17-20:18-50',
-                     7: '19-00:20-30'}
 
-days_dict = {1: "Понедельник",
-             2: "Вторник",
-             3: "Среда",
-             4: "Четверг",
-             5: "Пятница",
-             6: "Суббота"}
+class VariableError(Exception):
+    pass
 
 
 @define
@@ -23,8 +12,8 @@ class Lesson:
     time: str
     day: str
     week_type: bool
-    classroom: str
-    teacher_name: str
+    classroom: str | None
+    teacher_name: str | None
     lesson_type: str
     discipline: str
 
@@ -44,7 +33,7 @@ class Lesson:
             if "Л" in lesson_type:
                 lesson_type = "Лекция"
 
-        else:
+        if lesson_type is None:
             lesson_type = "Военная кафедра"
 
         return Lesson(
@@ -52,19 +41,14 @@ class Lesson:
             lessons_timetable[lesson_num],
             days_dict[day_number],
             even,
-            remove_redundant_spaces(classroom) if classroom is not None else "",
-            remove_redundant_spaces(teacher_name) if teacher_name is not None else "",
+            remove_redundant_spaces(classroom) if classroom else None,
+            remove_redundant_spaces(teacher_name) if teacher_name else None,
             remove_redundant_spaces(lesson_type),
             remove_redundant_spaces(discipline)
         )
 
 
 @define
-class Schedule:
-    sessions: list[Lesson]
-
-
-@define
 class Group:
     group_name: str
-    schedule: Schedule
+    schedule: list[Lesson]

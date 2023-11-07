@@ -1,7 +1,6 @@
 from openpyxl import load_workbook
-from group_hierarchy import Schedule, Lesson, Group
-from functions import contains_alphabet_character
-from config import filesize
+from xlsx_import.group_hierarchy import Lesson, Group
+from xlsx_import.functions import contains_alphabet_character
 
 
 def get_matrix(sheet, min_row: int, max_row: int, min_col: int, max_col: int):
@@ -10,12 +9,12 @@ def get_matrix(sheet, min_row: int, max_row: int, min_col: int, max_col: int):
             min_row=min_row, max_row=max_row, min_col=min_col, max_col=max_col):
         row_values = []
         for cell in row:
-            row_values.append(cell.value)
+            row_values.append(None if cell.value == "" else cell.value)  # если клетка не NoneType, но пустая, то замена
         sheet_matrix.append(row_values)
     return sheet_matrix
 
 
-def parse_group_schedule(schedule: list[list]) -> Schedule:
+def parse_group_schedule(schedule: list[list]) -> list[Lesson]:
     group_lessons = []
     day = 1
     lesson_count = 1
@@ -34,7 +33,7 @@ def parse_group_schedule(schedule: list[list]) -> Schedule:
             )
             group_lessons.append(parsed_lesson)
         lesson_count += 1
-    return Schedule(group_lessons)
+    return group_lessons
 
 
 def addition_by_sheet_type(sheet_type: int, switch: bool):
@@ -65,8 +64,9 @@ def get_multiple_schedules(sheet, matrices_num: int, sheet_type: int) -> list[Gr
     for i in range(matrices_num):
         max_column = min_column + 3  # end offset
         matrix = get_matrix(sheet, 4, 87, min_column, max_column)
-        min_column += addition_by_sheet_type(sheet_type,
-                                             switch)  # adding to min_column number to adjust matrix start position
+        min_column += addition_by_sheet_type(sheet_type, switch)
+        # adding to min_column number to adjust matrix start position
+
         switch = not switch
         group_timetable = parse_group_schedule(matrix)  # get schedule of each group from one sheet
 
@@ -74,7 +74,11 @@ def get_multiple_schedules(sheet, matrices_num: int, sheet_type: int) -> list[Gr
     prefix_list = get_year_prefixes(sheet, matrices_num, sheet_type)  # get name of each group from one sheet
     group_list = []
     for i in range(len(schedules)):
-        group_list.append(Group(prefix_list[i], schedules[i]))  # create Group instance and append it to schedules list
+        group_list.append(
+            Group(
+                group_name=prefix_list[i],
+                schedule=schedules[i]
+            ))  # create Group and append to schedules
 
     return group_list
 
@@ -99,9 +103,7 @@ def read_schedule(filename: str):
     return workbook
 
 
-def get_groups_timetable(sheet_path: str, current_filesize: int = filesize) -> None | list[Group]:
-    if current_filesize == filesize:
-        return None
+def get_groups_timetable(sheet_path: str) -> list[Group]:
     wb = read_schedule(sheet_path)
     sheet_names = wb.sheetnames
 
