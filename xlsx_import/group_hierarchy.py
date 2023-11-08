@@ -16,10 +16,11 @@ class Lesson:
     teacher_name: str | None
     lesson_type: str
     discipline: str
+    group_name: str
 
     @classmethod
     def from_list(cls, lesson_num: int, day_number: int, classroom: str | None, teacher_name: str | None,
-                  lesson_type: str | None, discipline: str):
+                  lesson_type: str | None, discipline: str, group_name: str):
 
         even = True if lesson_num % 2 == 0 else False
 
@@ -44,11 +45,6 @@ class Lesson:
             remove_redundant_spaces(classroom) if classroom else None,
             remove_redundant_spaces(teacher_name) if teacher_name else None,
             remove_redundant_spaces(lesson_type),
-            remove_redundant_spaces(discipline)
+            remove_redundant_spaces(discipline),
+            remove_redundant_spaces(group_name)
         )
-
-
-@define
-class Group:
-    group_name: str
-    schedule: list[Lesson]

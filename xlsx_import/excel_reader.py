@@ -1,5 +1,5 @@
 from openpyxl import load_workbook
-from xlsx_import.group_hierarchy import Lesson, Group
+from xlsx_import.group_hierarchy import Lesson
 from xlsx_import.functions import contains_alphabet_character
 
 
@@ -9,12 +9,12 @@ def get_matrix(sheet, min_row: int, max_row: int, min_col: int, max_col: int):
             min_row=min_row, max_row=max_row, min_col=min_col, max_col=max_col):
         row_values = []
         for cell in row:
-            row_values.append(None if cell.value == "" else cell.value)  # если клетка не NoneType, но пустая, то замена
+            row_values.append(None if cell.value == "" else cell.value)  # returns null to list if cell is empty
         sheet_matrix.append(row_values)
     return sheet_matrix
 
 
-def parse_group_schedule(schedule: list[list]) -> list[Lesson]:
+def parse_group_schedule(group_name: str, schedule: list[list]) -> list[Lesson]:
     group_lessons = []
     day = 1
     lesson_count = 1
@@ -29,7 +29,8 @@ def parse_group_schedule(schedule: list[list]) -> list[Lesson]:
                 classroom=lesson[3],
                 teacher_name=lesson[2],
                 lesson_type=lesson[1],
-                discipline=lesson[0]
+                discipline=lesson[0],
+                group_name=group_name
             )
             group_lessons.append(parsed_lesson)
         lesson_count += 1
@@ -56,11 +57,12 @@ def addition_by_sheet_type(sheet_type: int, switch: bool):
             return 10
 
 
-def get_multiple_schedules(sheet, matrices_num: int, sheet_type: int) -> list[Group]:
+def get_multiple_schedules(sheet, matrices_num: int, sheet_type: int) -> list[Lesson]:
     schedules = []
     min_column = 6  # start offset
 
     switch = False
+    prefix_list = get_year_prefixes(sheet, matrices_num, sheet_type)  # get name of each group from one sheet
     for i in range(matrices_num):
         max_column = min_column + 3  # end offset
         matrix = get_matrix(sheet, 4, 87, min_column, max_column)
@@ -68,19 +70,11 @@ def get_multiple_schedules(sheet, matrices_num: int, sheet_type: int) -> list[Gr
         # adding to min_column number to adjust matrix start position
 
         switch = not switch
-        group_timetable = parse_group_schedule(matrix)  # get schedule of each group from one sheet
+        group_timetable = parse_group_schedule(prefix_list[i], matrix)  # get schedule of each group from one sheet
 
-        schedules.append(group_timetable)
-    prefix_list = get_year_prefixes(sheet, matrices_num, sheet_type)  # get name of each group from one sheet
-    group_list = []
-    for i in range(len(schedules)):
-        group_list.append(
-            Group(
-                group_name=prefix_list[i],
-                schedule=schedules[i]
-            ))  # create Group and append to schedules
+        schedules.extend(group_timetable)
 
-    return group_list
+    return schedules
 
 
 def get_group_prefix(working_sheet, column: int) -> str:
@@ -103,7 +97,7 @@ def read_schedule(filename: str):
     return workbook
 
 
-def get_groups_timetable(sheet_path: str) -> list[Group]:
+def get_groups_timetable(sheet_path: str) -> list[Lesson]:
     wb = read_schedule(sheet_path)
     sheet_names = wb.sheetnames
 

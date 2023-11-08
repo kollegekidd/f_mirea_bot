@@ -2,57 +2,34 @@ from xlsx_import.group_hierarchy import Lesson
 from cattrs import unstructure
 from pymongo import MongoClient
 
-client = MongoClient("localhost:27017")
 
-db = client["mirea_schedule"]
+class Database:
 
-lessons = db["lesson"]
-lesson_schema = {
-    "lesson_num": int,
-    "time": str,
-    "day": str,
-    "week_type": bool,
-    "classroom": str,
-    "teacher_name": str,
-    "lesson_type": str,
-    "discipline": str
-}
+    def __init__(self, link: str):
+        self.link = link
+        self.lessons = self._get_lessons_table()
 
-class_groups = db["class_group"]
-class_group_schema = {
-    "group_name": str,
-    "class_schedules": [str],  # stores the object_id strings of class_schedule
-}
+    def __database_connect(self):
+        client = MongoClient(self.link)
 
+        return client["mirea_schedule"]
 
-def remove_all_groups_and_lessons():
-    cursor = lessons.find()
-    for record in cursor:
-        print(record)
+    def _get_lessons_table(self):
+        client = self.__database_connect()
+        return client["lesson"]
 
-    cursor = class_groups.find()
-    for record in cursor:
-        print(record)
-    lessons.delete_many({})
-    class_groups.delete_many({})
-    print('hi')
-    cursor = lessons.find()
-    for record in cursor:
-        print(record)
+    def remove_all_lessons(self):
+        self.lessons.delete_many({})
 
-    cursor = class_groups.find()
-    for record in cursor:
-        print(record)
+    def update_group(self, schedule: list[Lesson]):
+        lesson_doc = [unstructure(x) for x in schedule]
 
+        self.lessons.insert_many(lesson_doc)
 
-def update_group(group_name: str, schedule: list[Lesson]):
-    lesson_doc = [unstructure(x) for x in schedule]
+    def find_lessons_by_group_and_day(self, group_name: str, week_type: bool | int, day: str):
+        lesson_list = self.lessons.find({"group_name": group_name,
+                                         "week_type": bool(week_type),
+                                         "day": day})
+        return [x for x in lesson_list]
 
-    lessons.insert_many(lesson_doc)
-
-    class_group_doc = {
-        "group_name": group_name,
-        "class_schedules": [str(x['id'] for x in lesson_doc)]
-    }
-
-    class_groups.insert_one(class_group_doc)
+    find_lessons_by_group_and_day("ФКБО-01-23", 0, "Понедельник")
