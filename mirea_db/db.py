@@ -12,9 +12,9 @@ class Database:
         self.tg_users = self._get_users_table()
 
     def __database_connect_schedule(self):
-        client = MongoClient(self.link)
+        self.client = MongoClient(self.link)
 
-        return client["mirea_schedule"]
+        return self.client["mirea_schedule"]
 
     def _get_lessons_table(self):
         return self.client["lesson"]
