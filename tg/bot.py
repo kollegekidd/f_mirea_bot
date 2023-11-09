@@ -126,6 +126,7 @@ async def end(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     user_id = update.message.chat_id
     text = update.callback_query.data
+    print(f"preference: {text}")
     db.change_user_variable(user_id=user_id, variable_name='user_preference', value=int(text))
     await query.answer()
     await query.edit_message_text(text="Запомнили Ваш выбор. Вы сможете его поменять в любой момент в настройках.")
@@ -135,6 +136,7 @@ async def end(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def new(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     text = update.callback_query.data
+    print(f"new_user: {text}")
     db.fill_user(update.message.chat_id, int(text))
     await query.answer()
 
