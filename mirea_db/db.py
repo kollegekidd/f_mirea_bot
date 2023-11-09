@@ -7,20 +7,15 @@ class Database:
 
     def __init__(self, link: str):
         self.link = link
-        self.client = MongoClient(self.link)
+        self.client = MongoClient(self.link)["mirea_schedule"]
         self.lessons = self._get_lessons_table()
         self.tg_users = self._get_users_table()
-
-    def __database_connect_schedule(self):
-        self.client = MongoClient(self.link)
-
-        return self.client["mirea_schedule"]
 
     def _get_lessons_table(self):
         return self.client["lesson"]
 
     def _get_users_table(self):
-        return self.client["tg_users"]
+        return self.client["tg_user"]
 
     def remove_all_lessons(self):
         self.lessons.delete_many({})
