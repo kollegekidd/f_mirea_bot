@@ -26,7 +26,7 @@ def parse_args(argv):
     return args
 
 
-async def check_timetable(filepath: str, link: str, web_parse: bool = None):
+async def check_timetable(filepath: str, link: str, web_parse: bool = True):
     if not web_parse and filepath == "":
         raise InputArgumentError(f"Необходимо указать параметр пути или необходимости парсинга.")
     if web_parse is None:
