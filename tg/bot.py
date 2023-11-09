@@ -36,31 +36,36 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # Stages
-START_ROUTES, END_ROUTES = range(2)
+START_ROUTES, MID_ROUTES, END_ROUTES = range(3)
 # Callback data
-ONE, TWO, THREE, FOUR = range(4)
+ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FOURTEEN, FIFTEEN, SIXTEEN, \
+ SEVENTEEN, EIGHTEEN, NINETEEN, TWENTY = range(20)
 
 db = Database(link="localhost:27017")
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Send message on `/start`."""
     # Get user that sent /start and log his name
-    user = update.message.from_user
-    logger.info("User %s started the conversation.", user.first_name)
-    # Build InlineKeyboard where each button has a displayed text
-    # and a string as callback_data
-    # The keyboard is a list of button rows, where each row is in turn
-    # a list (hence `[[...]]`).
+    user = update.message.chat_id
+    logger.info("User %s started the conversation.", user)
+
     keyboard = [
         [
-            InlineKeyboardButton("1", callback_data=str(ONE)),
-            InlineKeyboardButton("2", callback_data=str(TWO)),
+            InlineKeyboardButton("ФКБО-01-20", callback_data=str(ONE)),
+            InlineKeyboardButton("ФКБО-01-21", callback_data=str(TWO)),
+            InlineKeyboardButton("", callback_data=str(THREE)),
+            InlineKeyboardButton("", callback_data=str(FOUR))
+        ]
+        [
+            InlineKeyboardButton("")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    # Send message with text and appended InlineKeyboard
-    await update.message.reply_text("Start handler, Choose a route", reply_markup=reply_markup)
-    # Tell ConversationHandler that we're in state `FIRST` now
+
+    await update.message.reply_text("Привет, это бот с расписанием РТУ МИРЭА филиала г. Фрязино. "
+                                    "Пожалуйста, выбери свою группу.", reply_markup=reply_markup)
+
     return START_ROUTES
 
 
@@ -168,7 +173,7 @@ async def end(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().bot_token(bot_token).build()
+    application = Application.builder().token(bot_token).build()
 
     # Setup conversation handler with the states FIRST and SECOND
     # Use the pattern parameter to pass CallbackQueries with specific

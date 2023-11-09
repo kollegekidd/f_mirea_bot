@@ -6,17 +6,22 @@ from pymongo import MongoClient
 class Database:
 
     def __init__(self, link: str):
-        self.link = link
-        self.lessons = self._get_lessons_table()
 
-    def __database_connect(self):
+        self.link = link
+        self.client = MongoClient(self.link)
+        self.lessons = self._get_lessons_table()
+        self.tg_users = self._get_users_table()
+
+    def __database_connect_schedule(self):
         client = MongoClient(self.link)
 
         return client["mirea_schedule"]
 
     def _get_lessons_table(self):
-        client = self.__database_connect()
-        return client["lesson"]
+        return self.client["lesson"]
+
+    def _get_users_table(self):
+        return self.client["tg_users"]
 
     def remove_all_lessons(self):
         self.lessons.delete_many({})
@@ -32,4 +37,14 @@ class Database:
                                          "day": day})
         return [x for x in lesson_list]
 
-    find_lessons_by_group_and_day("ФКБО-01-23", 0, "Понедельник")
+    def fill_user(self, user_id: int, user_group: int = 0, user_preference: int = 0):
+        self.tg_users.insert_one({
+            "user_id": user_id,
+            "user_group": user_group,
+            "user_preference": user_preference
+        })
+
+    def check_user_existence(self, user_id: int):
+        return True if self.tg_users.count_documents({"user_id": user_id}) > 0 else False
+
+

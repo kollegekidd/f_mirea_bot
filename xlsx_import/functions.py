@@ -17,7 +17,7 @@ group_dict = {
                 14: "ФКБВ-01-21",
                 15: "ФКБВ-01-22",
                 16: "ФКБВ-01-23",
-                17: "ФКМО-01-23",
+                17: "ФРМО-01-22",
                 18: "ФРМО-01-23",
                 19: "ФКМО-01-22",
                 20: "ФКМО-01-23"
@@ -48,6 +48,10 @@ def is_even_week(start_date):
     week_even = week_difference % 2 == 0
 
     return week_even
+
+
+def get_current_day():
+    return datetime.datetime.now().weekday()
 
 
 def contains_alphabet_character(text):
