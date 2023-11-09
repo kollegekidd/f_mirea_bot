@@ -1,5 +1,5 @@
 import sys
-from argparse import ArgumentError, ArgumentParser, BooleanOptionalAction
+from argparse import ArgumentError, ArgumentParser
 from xlsx_import.excel_reader import get_groups_timetable
 from xlsx_import.config import filesize
 import os
@@ -16,7 +16,7 @@ def parse_args(argv):
         argparser = ArgumentParser(exit_on_error=False)
         argparser.add_argument('-f', '--filepath', type=str, default="",
                                help="Path to students schedule in xlsx format")
-        argparser.add_argument('-l' '--link', type=str, required=True,
+        argparser.add_argument('-l', '--link', type=str, required=True,
                                help="Link to a MongoDB Database")
         args = argparser.parse_args(argv[1:])
     except ArgumentError as e:
