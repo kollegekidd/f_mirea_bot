@@ -143,7 +143,7 @@ async def end(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     user_id = update.message.chat_id
     text = update.callback_query.data
-    db.change_user_preference(user_id=user_id, user_preference=int(text))
+    db.change_user_variable(user_id=user_id, variable_name='user_preference', value=int(text))
     await query.answer()
     await query.edit_message_text(text="Запомнили Ваш выбор. Вы сможете его поменять в любой момент в настройках.")
     return ConversationHandler.END
