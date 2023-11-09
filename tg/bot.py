@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 # Stages
 START_ROUTES, MID_ROUTES, END_ROUTES = range(3)
 # Callback data
-ONE, TWO, THREE, FOUR, FIVE = 'first', 'second', 'third', 'fifth', 'sixth'
+ONE = 'first'
 
 db = Database(link="localhost:27017")
 
@@ -78,24 +78,6 @@ async def one(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     await query.answer()
     keyboard = [
-
-        [InlineKeyboardButton("Следующая страница", callback_data='second')],
-
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(
-        text="Привет, это бот с расписанием РТУ МИРЭА филиала г. Фрязино. "
-             "Пожалуйста, выбери свою группу.", reply_markup=reply_markup
-    )
-    return START_ROUTES
-
-
-async def two(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Show new choice of buttons"""
-    query = update.callback_query
-    await query.answer()
-    keyboard = [
-
         [InlineKeyboardButton("ФЭБО-01-22", callback_data='11')],
         [InlineKeyboardButton("ФЭБО-01-23", callback_data='12')],
         [InlineKeyboardButton("ФКБВ-01-20", callback_data='13')],
@@ -106,6 +88,7 @@ async def two(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         [InlineKeyboardButton("ФРМО-01-23", callback_data='18')],
         [InlineKeyboardButton("ФКМО-01-22", callback_data='19')],
         [InlineKeyboardButton("ФКМО-01-23", callback_data='20')],
+        [InlineKeyboardButton("Следующая страница", callback_data='second')],
 
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -185,7 +168,6 @@ def main() -> None:
             START_ROUTES: [
                 CallbackQueryHandler(new, pattern="^[0-9]+$"),
                 CallbackQueryHandler(one, pattern="^first$"),
-                CallbackQueryHandler(two, pattern="^second$"),
             ],
             END_ROUTES: [
                 CallbackQueryHandler(end, pattern="^[0-9]+$"),
