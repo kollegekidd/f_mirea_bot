@@ -26,6 +26,7 @@ from telegram.ext import (
 )
 from mirea_db.db import Database
 from tg.config import bot_token
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -38,8 +39,7 @@ logger = logging.getLogger(__name__)
 # Stages
 START_ROUTES, MID_ROUTES, END_ROUTES = range(3)
 # Callback data
-ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FOURTEEN, FIFTEEN, SIXTEEN, \
- SEVENTEEN, EIGHTEEN, NINETEEN, TWENTY = range(20)
+ONE, TWO, THREE, FOUR, FIVE = 'first', 'second', 'third', 'fifth', 'sixth'
 
 db = Database(link="localhost:27017")
 
@@ -51,15 +51,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     logger.info("User %s started the conversation.", user)
 
     keyboard = [
-        [
-            InlineKeyboardButton("ФКБО-01-20", callback_data=str(ONE)),
-            InlineKeyboardButton("ФКБО-01-21", callback_data=str(TWO)),
-            InlineKeyboardButton("", callback_data=str(THREE)),
-            InlineKeyboardButton("", callback_data=str(FOUR))
-        ]
-        [
-            InlineKeyboardButton("")
-        ]
+
+        [InlineKeyboardButton("ФКБО-01-20", callback_data='1')],
+        [InlineKeyboardButton("ФКБО-01-21", callback_data='2')],
+        [InlineKeyboardButton("ФКБО-01-22", callback_data='3')],
+        [InlineKeyboardButton("ФКБО-01-23", callback_data='4')],
+        [InlineKeyboardButton("ФВБО-01-20", callback_data='5')],
+        [InlineKeyboardButton("ФВБО-01-21", callback_data='6')],
+        [InlineKeyboardButton("ФВБО-01-22", callback_data='7')],
+        [InlineKeyboardButton("ФВБО-01-23", callback_data='8')],
+        [InlineKeyboardButton("ФЭБО-01-20", callback_data='9')],
+        [InlineKeyboardButton("ФЭБО-01-21", callback_data='10')],
+        [InlineKeyboardButton("Следующая страница", callback_data='first')],
+
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -69,40 +73,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return START_ROUTES
 
 
-async def start_over(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Prompt same text & keyboard as `start` does but not as new message"""
-    # Get CallbackQuery from Update
-    query = update.callback_query
-    # CallbackQueries need to be answered, even if no notification to the user is needed
-    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
-    await query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("1", callback_data=str(ONE)),
-            InlineKeyboardButton("2", callback_data=str(TWO)),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    # Instead of sending a new message, edit the message that
-    # originated the CallbackQuery. This gives the feeling of an
-    # interactive menu.
-    await query.edit_message_text(text="Start handler, Choose a route", reply_markup=reply_markup)
-    return START_ROUTES
-
-
 async def one(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     await query.answer()
     keyboard = [
-        [
-            InlineKeyboardButton("3", callback_data=str(THREE)),
-            InlineKeyboardButton("4", callback_data=str(FOUR)),
-        ]
+
+        [InlineKeyboardButton("Следующая страница", callback_data='second')],
+
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(
-        text="First CallbackQueryHandler, Choose a route", reply_markup=reply_markup
+        text="Привет, это бот с расписанием РТУ МИРЭА филиала г. Фрязино. "
+             "Пожалуйста, выбери свою группу.", reply_markup=reply_markup
     )
     return START_ROUTES
 
@@ -112,22 +95,32 @@ async def two(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     await query.answer()
     keyboard = [
-        [
-            InlineKeyboardButton("hey", callback_data=str(FOUR)),
-            InlineKeyboardButton("3", callback_data=str(THREE)),
-        ]
+
+        [InlineKeyboardButton("ФЭБО-01-22", callback_data='11')],
+        [InlineKeyboardButton("ФЭБО-01-23", callback_data='12')],
+        [InlineKeyboardButton("ФКБВ-01-20", callback_data='13')],
+        [InlineKeyboardButton("ФКБВ-01-21", callback_data='14')],
+        [InlineKeyboardButton("ФКБВ-01-22", callback_data='15')],
+        [InlineKeyboardButton("ФКБВ-01-23", callback_data='16')],
+        [InlineKeyboardButton("ФРМО-01-22", callback_data='17')],
+        [InlineKeyboardButton("ФРМО-01-23", callback_data='18')],
+        [InlineKeyboardButton("ФКМО-01-22", callback_data='19')],
+        [InlineKeyboardButton("ФКМО-01-23", callback_data='20')],
+
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(
-        text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
+        text="Привет, это бот с расписанием РТУ МИРЭА филиала г. Фрязино. "
+             "Пожалуйста, выбери свою группу.", reply_markup=reply_markup
     )
     return START_ROUTES
 
 
-async def three(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def tetetete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Show new choice of buttons. This is the end point of the conversation."""
     query = update.callback_query
-    test_values = db.find_lessons_by_group_and_day("ФКБО-01-23", 0, "Понедельник")
+
+    # test_values = db.find_lessons_by_group_and_day("ФКБО-01-23", 0, "Понедельник")
     await query.answer()
     keyboard = [
         [
@@ -137,27 +130,10 @@ async def three(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(
-        text=str(test_values), reply_markup=reply_markup
+        text=str('test_values'), reply_markup=reply_markup
     )
     # Transfer to conversation state `SECOND`
     return END_ROUTES
-
-
-async def four(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Show new choice of buttons"""
-    query = update.callback_query
-    await query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("2", callback_data=str(TWO)),
-            InlineKeyboardButton("3", callback_data=str(THREE)),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(
-        text="Fourth CallbackQueryHandler, Choose a route", reply_markup=reply_markup
-    )
-    return START_ROUTES
 
 
 async def end(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -165,9 +141,31 @@ async def end(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     ConversationHandler that the conversation is over.
     """
     query = update.callback_query
+    user_id = update.message.chat_id
+    text = update.callback_query.data
+    db.change_user_preference(user_id=user_id, user_preference=int(text))
     await query.answer()
-    await query.edit_message_text(text="See you next time!")
+    await query.edit_message_text(text="Запомнили Ваш выбор. Вы сможете его поменять в любой момент в настройках.")
     return ConversationHandler.END
+
+
+async def new(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    text = update.callback_query.data
+    db.fill_user(update.message.chat_id, int(text))
+    await query.answer()
+
+    keyboard = [
+        [InlineKeyboardButton("7:00 и 19:00 сегодняшние, 21:00 завтрашние", callback_data='0')],
+        [InlineKeyboardButton("Только утром в 7", callback_data='1')],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await query.edit_message_text(
+        text="Выбери в какое время тебе присылать уведомления", reply_markup=reply_markup
+    )
+    return END_ROUTES
 
 
 def main() -> None:
@@ -185,14 +183,12 @@ def main() -> None:
         entry_points=[CommandHandler("start", start)],
         states={
             START_ROUTES: [
-                CallbackQueryHandler(one, pattern="^" + str(ONE) + "$"),
-                CallbackQueryHandler(two, pattern="^" + str(TWO) + "$"),
-                CallbackQueryHandler(three, pattern="^" + str(THREE) + "$"),
-                CallbackQueryHandler(four, pattern="^" + str(FOUR) + "$"),
+                CallbackQueryHandler(new, pattern="^[0-9]+$"),
+                CallbackQueryHandler(one, pattern="^first$"),
+                CallbackQueryHandler(two, pattern="^second$"),
             ],
             END_ROUTES: [
-                CallbackQueryHandler(start_over, pattern="^" + str(ONE) + "$"),
-                CallbackQueryHandler(end, pattern="^" + str(TWO) + "$"),
+                CallbackQueryHandler(end, pattern="^[0-9]+$"),
             ],
         },
         fallbacks=[CommandHandler("start", start)],
