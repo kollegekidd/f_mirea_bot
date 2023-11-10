@@ -20,6 +20,9 @@ class Database:
     def remove_all_lessons(self):
         self.lessons.delete_many({})
 
+    def remove_all_users(self):
+        self.tg_users.delete_many({})
+
     def update_group(self, schedule: list[Lesson]):
         lesson_doc = [unstructure(x) for x in schedule]
 
@@ -39,8 +42,20 @@ class Database:
         })
 
     def change_user_variable(self, user_id: int, variable_name: str, value):
-        current_user = self.tg_users.find_one({"user_id": user_id})
-        current_user.update_one({"$set": {variable_name: value}})
+        db.tg_users.update({
+            "user_id": user_id
+        },
+            [
+                {
+                    "$set": {
+                        variable_name: value
+                    }
+                }
+            ])
 
     def check_user_existence(self, user_id: int):
         return True if self.tg_users.count_documents({"user_id": user_id}) > 0 else False
+
+
+db = Database("localhost:27017")
+db.remove_all_users()
